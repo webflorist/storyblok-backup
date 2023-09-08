@@ -97,62 +97,52 @@ name: Weekly Storyblok Backup
 
 on:
   schedule:
-    - cron: "0 0 * * 0"
+    - cron: '0 0 * * 0'
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-        - name: Checkout
-            uses: actions/checkout@v3
+      - name: Perform Backup
+        env:
+          STORYBLOK_OAUTH_TOKEN: ${{ secrets.STORYBLOK_OAUTH_TOKEN }}
+          STORYBLOK_SPACE_ID: ${{ secrets.STORYBLOK_SPACE_ID }}
+        run: npx storyblok-backup-cli --token $STORYBLOK_OAUTH_TOKEN --space $STORYBLOK_SPACE_ID --create-zip
 
-        - name: Install pnpm
-            uses: pnpm/action-setup@v2
-            with:
-                version: 8
-                run_install: false
+      - name: Delete Old Artifacts
+        uses: actions/github-script@v6
+        id: artifact
+        with:
+          script: |
+            const res = await github.rest.actions.listArtifactsForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+            })
 
-        - name: Install Node.js
-            uses: actions/setup-node@v3
-            with:
-                node-version: 18
-                cache: 'pnpm'
-
-        - name: Install dependencies
-            run: pnpm install --frozen-lockfile
-
-            - name: Delete Old Artifacts
-            uses: actions/github-script@v6
-            id: artifact
-            with:
-                script: |
-                const res = await github.rest.actions.listArtifactsForRepo({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
+            res.data.artifacts
+                .filter(({ name }) => name === 'weekly-backup')
+                .forEach(({ id }) => {
+                  github.rest.actions.deleteArtifact({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      artifact_id: id,
+                  })
                 })
 
-                res.data.artifacts
-                    .filter(({ name }) => name === 'package')
-                    .forEach(({ id }) => {
-                    github.rest.actions.deleteArtifact({
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        artifact_id: id,
-                    })
-                    })
+      - name: Copy Artifact
+        run: mkdir artifact && cp ./.output/*.zip artifact
 
-            - name: Copy Artifact
-            run: mkdir staging && cp target/*.jar staging
-
-            - name: Upload Artifact
-            uses: actions/upload-artifact@v3
-            with:
-                name: package
-                path: staging
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: weekly-backup
+          path: artifact
 ```
 
 Make sure, to set the secrets `STORYBLOK_OAUTH_TOKEN` and `STORYBLOK_SPACE_ID` in your repository settings.
+
+If you create multiple workflows for daily, weekly and monthly backups, by changing the cron-schedule and the two occurrences of the artifact name `weekly-backup`, you will always have exactly one daily, weekly and monthly backup.
 
 Also keep in mind, that there is a limit on artifact storage and runner minutes ([see GitHub docs](https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions#included-storage-and-minutes)).
 

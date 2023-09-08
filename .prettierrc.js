@@ -7,7 +7,7 @@ module.exports = {
 	trailingComma: 'es5',
 	overrides: [
 		{
-			files: '**/*.md',
+			files: ['**/*.md', '**/*.yaml', '**/*.yml'],
 			options: {
 				tabWidth: 2,
 			},

@@ -1,5 +1,5 @@
 {
-	"name": "@webflorist/storyblok-backup-cli",
+	"name": "storyblok-backup-cli",
 	"version": "0.0.1",
 	"description": "npx CLI tool to create a full backup of a Storyblok space",
 	"scripts": {
@@ -34,7 +34,7 @@
 	},
 	"homepage": "https://github.com/webflorist/storyblok-backup-cli#readme",
 	"devDependencies": {
-		"eslint": "^8.48.0",
+		"eslint": "^8.49.0",
 		"eslint-config-prettier": "^9.0.0",
 		"eslint-plugin-prettier": "^5.0.0",
 		"prettier": "^3.0.3"
