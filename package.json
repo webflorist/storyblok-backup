@@ -1,0 +1,48 @@
+{
+	"name": "@webflorist/storyblok-backup-cli",
+	"version": "0.0.1",
+	"description": "npx CLI tool to create a full backup of a Storyblok space",
+	"scripts": {
+		"upgrade": "npx npm-check-updates -i -u && pnpm install",
+		"lint:js": "eslint --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .lintignore .",
+		"lintfix:js": "pnpm lint:js --fix",
+		"lint:prettier": "prettier --ignore-path ./.lintignore --check .",
+		"lintfix:prettier": "prettier --ignore-path ./.lintignore --write --list-different .",
+		"lint": "pnpm lint:js && pnpm lint:prettier",
+		"lintfix": "pnpm lintfix:js && pnpm lintfix:prettier"
+	},
+	"bin": {
+		"storyblok-backup": "bin/storyblok-backup.mjs"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/webflorist/storyblok-backup-cli.git"
+	},
+	"keywords": [
+		"storyblok",
+		"cms",
+		"backup",
+		"cli",
+		"node",
+		"script",
+		"npx"
+	],
+	"author": "Gerald Buttinger <gerald@code.florist>",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/webflorist/storyblok-backup-cli/issues"
+	},
+	"homepage": "https://github.com/webflorist/storyblok-backup-cli#readme",
+	"devDependencies": {
+		"eslint": "^8.48.0",
+		"eslint-config-prettier": "^9.0.0",
+		"eslint-plugin-prettier": "^5.0.0",
+		"prettier": "^3.0.3"
+	},
+	"dependencies": {
+		"archiver": "^6.0.1",
+		"minimist": "^1.2.8",
+		"storyblok-js-client": "^6.0.0",
+		"zip-lib": "^0.7.3"
+	}
+}

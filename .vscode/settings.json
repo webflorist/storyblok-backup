@@ -1,0 +1,10 @@
+{
+	"editor.tabSize": 3,
+	"editor.insertSpaces": true,
+	"editor.detectIndentation": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"eslint.enable": true,
+	"editor.quickSuggestions": {
+		"strings": true
+	}
+}
