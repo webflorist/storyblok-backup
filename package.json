@@ -1,5 +1,5 @@
 {
-	"name": "storyblok-backup-cli",
+	"name": "storyblok-backup",
 	"version": "0.0.1",
 	"description": "npx CLI tool to create a full backup of a Storyblok space",
 	"scripts": {
@@ -16,7 +16,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/webflorist/storyblok-backup-cli.git"
+		"url": "git+https://github.com/webflorist/storyblok-backup.git"
 	},
 	"keywords": [
 		"storyblok",
@@ -30,9 +30,9 @@
 	"author": "Gerald Buttinger <gerald@code.florist>",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/webflorist/storyblok-backup-cli/issues"
+		"url": "https://github.com/webflorist/storyblok-backup/issues"
 	},
-	"homepage": "https://github.com/webflorist/storyblok-backup-cli#readme",
+	"homepage": "https://github.com/webflorist/storyblok-backup#readme",
 	"devDependencies": {
 		"eslint": "^8.49.0",
 		"eslint-config-prettier": "^9.0.0",

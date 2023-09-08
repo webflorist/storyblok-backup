@@ -1,6 +1,6 @@
 # Storyblok Backup CLI
 
-[![npm version](https://img.shields.io/npm/v/@webflorist/storyblok-backup.svg)](https://www.npmjs.com/package/@webflorist/storyblok-backup)
+[![npm version](https://img.shields.io/npm/v/storyblok-backup.svg)](https://www.npmjs.com/package/storyblok-backup)
 [![license](https://img.shields.io/github/license/webflorist/storyblok-backup)](https://github.com/webflorist/storyblok-backup/blob/main/LICENSE)
 
 A npx CLI tool to create a full backup of a space of the [Storyblok CMS](https://www.storyblok.com).
@@ -108,7 +108,7 @@ jobs:
         env:
           STORYBLOK_OAUTH_TOKEN: ${{ secrets.STORYBLOK_OAUTH_TOKEN }}
           STORYBLOK_SPACE_ID: ${{ secrets.STORYBLOK_SPACE_ID }}
-        run: npx storyblok-backup-cli --token $STORYBLOK_OAUTH_TOKEN --space $STORYBLOK_SPACE_ID --create-zip
+        run: npx storyblok-backup --token $STORYBLOK_OAUTH_TOKEN --space $STORYBLOK_SPACE_ID --create-zip
 
       - name: Delete Old Artifacts
         uses: actions/github-script@v6
@@ -148,4 +148,4 @@ Also keep in mind, that there is a limit on artifact storage and runner minutes 
 
 ## License
 
-This package is open-sourced software licensed under the [MIT license](https://github.com/webflorist/storyblok-backup-cli/blob/main/LICENSE.).
+This package is open-sourced software licensed under the [MIT license](https://github.com/webflorist/storyblok-backup/blob/main/LICENSE.).
