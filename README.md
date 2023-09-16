@@ -27,11 +27,12 @@ The script will fetch the following resources of a Storyblok space using the Man
 ## Installation
 
 ```shell
-# install globally
-$ npm install -g storyblok-backup
 
-# or simply run via npx
+# simply auto-download and run via npx
 $ npx storyblok-backup
+
+# or install globally
+$ npm install -g storyblok-backup
 
 # or install for project using npm
 $ npm install storyblok-backup
@@ -44,6 +45,8 @@ $ pnpm add storyblok-backup
 ```
 
 ## Usage
+
+Call `npx storyblok-backup` with the following options:
 
 ### Options
 
@@ -100,8 +103,10 @@ on:
     - cron: '0 0 * * 0'
 
 jobs:
-  build:
+  backup:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
 
     steps:
       - name: Perform Backup
@@ -141,6 +146,8 @@ jobs:
 ```
 
 Make sure, to set the secrets `STORYBLOK_OAUTH_TOKEN` and `STORYBLOK_SPACE_ID` in your repository settings.
+
+Note that artifact manipulation requires the `actions: write` permission for the workflow. The workflow above has this permission set already.
 
 If you create multiple workflows for daily, weekly and monthly backups, by changing the cron-schedule and the two occurrences of the artifact name `weekly-backup`, you will always have exactly one daily, weekly and monthly backup.
 
