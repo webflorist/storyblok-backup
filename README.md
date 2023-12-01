@@ -114,7 +114,7 @@ jobs:
         env:
           STORYBLOK_OAUTH_TOKEN: ${{ secrets.STORYBLOK_OAUTH_TOKEN }}
           STORYBLOK_SPACE_ID: ${{ secrets.STORYBLOK_SPACE_ID }}
-        run: npx storyblok-backup --token $STORYBLOK_OAUTH_TOKEN --space $STORYBLOK_SPACE_ID --create-zip
+        run: npx storyblok-backup --token $STORYBLOK_OAUTH_TOKEN --space $STORYBLOK_SPACE_ID
 
       - name: Delete Old Artifacts
         uses: actions/github-script@v6
@@ -136,14 +136,11 @@ jobs:
                   })
                 })
 
-      - name: Copy Artifact
-        run: mkdir artifact && cp ./.output/*.zip artifact
-
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: weekly-backup
-          path: artifact
+          path: .output
 ```
 
 Make sure, to set the secrets `STORYBLOK_OAUTH_TOKEN` and `STORYBLOK_SPACE_ID` in your repository settings.
