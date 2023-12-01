@@ -72,7 +72,7 @@ Call `npx storyblok-backup` with the following options:
 npx storyblok-backup --token 1234567890abcdef --space 12345
 ```
 
-This will create the folder `./.output` and fetch all resources sorted into folders.
+This will create the folder `./.output/backup` and fetch all resources sorted into folders.
 
 ### Maximal example
 
@@ -88,7 +88,7 @@ npx storyblok-backup \
     --verbose
 ```
 
-This will create the folder `./my-dir`, fetch all resources (incl. the original file assets) sorted into folders, zip them to `./my-dir/daily-Y-m-d-H-i-s.zip`, and log every written file to console.
+This will create the folder `./my-dir/backup`, fetch all resources (incl. the original file assets) sorted into folders, zip them to `./my-dir/daily-Y-m-d-H-i-s.zip`, and log every written file to console.
 
 ## Continuous Integration
 

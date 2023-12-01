@@ -64,6 +64,8 @@ const verbose = 'verbose' in args
 
 const outputDir = args['output-dir'] || './.output'
 
+const backupDir = `${outputDir}/backup`
+
 if (fs.existsSync(outputDir) && !('force' in args)) {
 	console.log(
 		`Error: Output directory "${outputDir}" already exists. Use --force to delete and recreate it (POSSIBLY DANGEROUS!).`
@@ -105,7 +107,7 @@ if (fs.existsSync(outputDir)) {
 }
 
 // Create output directories
-fs.mkdirSync(outputDir, { recursive: true })
+fs.mkdirSync(backupDir, { recursive: true })
 
 const resources = [
 	'stories',
@@ -124,7 +126,7 @@ const resources = [
 	'workflows',
 	'releases',
 ]
-resources.forEach((resource) => fs.mkdirSync(`${outputDir}/${resource}`))
+resources.forEach((resource) => fs.mkdirSync(`${backupDir}/${resource}`))
 
 // Function to perform a default fetch
 const defaultFetch = async (type, folder, fileField, fileFieldObject) => {
@@ -148,7 +150,7 @@ const defaultFetch = async (type, folder, fileField, fileFieldObject) => {
 
 // Function to write a file
 const writeJson = (folder, file, content) => {
-	let outputFile = outputDir
+	let outputFile = backupDir
 	if (folder !== null) {
 		outputFile += `/${folder}`
 	}
@@ -164,7 +166,7 @@ const writeJson = (folder, file, content) => {
 // Function to download a file
 const downloadFile = async (type, name, url) => {
 	const res = await fetch(url)
-	const outputFile = `${outputDir}/${type}/${name}`
+	const outputFile = `${backupDir}/${type}/${name}`
 	const fileStream = fs.createWriteStream(outputFile, { flags: 'wx' })
 	await finished(Readable.fromWeb(res.body).pipe(fileStream))
 	if (verbose) console.log(`Written file ${outputFile}`)
@@ -286,7 +288,7 @@ await defaultFetch('releases', 'releases', 'id')
 if ('create-zip' in args) {
 	console.log(`Creating zip file`)
 	await zipLib
-		.archiveFolder(outputDir, filePath)
+		.archiveFolder(backupDir, filePath)
 		.then(
 			function () {
 				console.log(`Backup file '${filePath}' successfully created.`)
