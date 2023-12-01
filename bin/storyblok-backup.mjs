@@ -38,8 +38,11 @@ MAXIMAL EXAMPLE
   $ npx storyblok-backup \\
       --token 1234567890abcdef \\
       --space 12345 \\
+      --with-asset-files \\
       --output-dir ./backup \\
-      --zip-prefix daily
+      --force \\
+      --create-zip \\
+      --zip-prefix daily \\
       --verbose
 `)
 	process.exit(0)
