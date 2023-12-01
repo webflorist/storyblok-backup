@@ -82,6 +82,7 @@ npx storyblok-backup \
     --space 12345 \
     --with-asset-files \
     --output-dir ./my-dir \
+    --force \
     --create-zip \
     --zip-prefix daily \
     --verbose
