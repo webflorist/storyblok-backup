@@ -127,10 +127,19 @@ const resources = [
 resources.forEach((resource) => fs.mkdirSync(`${outputDir}/${resource}`))
 
 // Function to perform a default fetch
-const defaultFetch = async (type, folder, fileField) => {
+const defaultFetch = async (type, folder, fileField, fileFieldObject) => {
 	await StoryblokMAPI.getAll(`spaces/${spaceId}/${type}`)
 		.then((items) => {
-			items.forEach((item) => writeJson(folder, item[fileField], item))
+			if (type === 'datasources') {
+				console.log(items)
+			}
+			items.forEach((item) =>
+				writeJson(
+					folder,
+					fileFieldObject ? item[fileFieldObject][fileField] : item[fileField],
+					item
+				)
+			)
 		})
 		.catch((error) => {
 			throw error
@@ -247,7 +256,7 @@ await defaultFetch('tasks', 'tasks', 'id')
 
 // Fetch all activities
 console.log(`Fetching activities`)
-await defaultFetch('activities', 'activities', 'id')
+await defaultFetch('activities', 'activities', 'id', 'activity')
 
 // Fetch all presets
 console.log(`Fetching presets`)
