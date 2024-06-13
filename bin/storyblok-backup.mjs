@@ -39,7 +39,7 @@ MAXIMAL EXAMPLE
       --token 1234567890abcdef \\
       --space 12345 \\
       --with-asset-files \\
-      --output-dir ./backup \\
+      --output-dir ./my-dir \\
       --force \\
       --create-zip \\
       --zip-prefix daily \\
