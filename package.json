@@ -1,6 +1,6 @@
 {
 	"name": "storyblok-backup",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "npx CLI tool to create a full backup of a Storyblok space",
 	"scripts": {
 		"upgrade": "npx npm-check-updates -i -u && pnpm install",
