@@ -40,7 +40,6 @@
 		"prettier": "^3.0.3"
 	},
 	"dependencies": {
-		"archiver": "^6.0.1",
 		"minimist": "^1.2.8",
 		"storyblok-js-client": "^6.0.0",
 		"zip-lib": "^0.7.3"
