@@ -21,6 +21,12 @@ OPTIONS
                       in the account settings of a Stoyblok user.
                       (NOT the Access Token of a Space!)
   --space <space_id>  (required) ID of the space to backup
+  --region <region>   Region of the space. Possible values are:
+                      - 'eu' (default): EU
+                      - 'us': US
+                      - 'ap': Australia
+                      - 'ca': Canada
+                      - 'cn': China
   --with-asset-files  Downloads all files (assets) of the space. Defaults to false.
   --output-dir <dir>  Directory to write the backup to. Defaults to ./.output
                       (ATTENTION: Will fail if the directory already exists!)
@@ -38,6 +44,7 @@ MAXIMAL EXAMPLE
   $ npx storyblok-backup \\
       --token 1234567890abcdef \\
       --space 12345 \\
+      --region ap \\
       --with-asset-files \\
       --output-dir ./my-dir \\
       --force \\
@@ -60,6 +67,11 @@ if (!('space' in args)) {
 	process.exit(1)
 }
 
+if ('region' in args && !['eu', 'us', 'ap', 'ca', 'cn'].includes(args.region)) {
+	console.log('Error: Invalid region parameter stated. Use --help to find out more.')
+	process.exit(1)
+}
+
 const verbose = 'verbose' in args
 
 const outputDir = args['output-dir'] || './.output'
@@ -74,6 +86,8 @@ if (fs.existsSync(outputDir) && !('force' in args)) {
 }
 
 const spaceId = args.space
+
+const region = args['region'] || 'eu'
 
 const filePrefix = args['zip-prefix'] || 'backup'
 
@@ -99,6 +113,7 @@ if ('create-zip' in args) {
 // Init Management API
 const StoryblokMAPI = new StoryblokClient({
 	oauthToken: args.token,
+	region: region,
 })
 
 // Remove existing output directory

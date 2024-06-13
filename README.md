@@ -55,6 +55,12 @@ Call `npx storyblok-backup` with the following options:
                     in the account settings of a Stoyblok user.
                     (NOT the Access Token of a Space!)
 --space <space_id>  (required) ID of the space to backup
+--region <region>   Region of the space. Possible values are:
+                    - 'eu' (default): EU
+                    - 'us': US
+                    - 'ap': Australia
+                    - 'ca': Canada
+                    - 'cn': China
 --with-asset-files  Downloads all files (assets) of the space. Defaults to false.
 --output-dir <dir>  Directory to write the backup to. Defaults to ./.output
                     (ATTENTION: Will fail if the directory already exists!)
@@ -80,6 +86,7 @@ This will create the folder `./.output/backup` and fetch all resources sorted in
 npx storyblok-backup \
     --token 1234567890abcdef \
     --space 12345 \
+    --region ap \\
     --with-asset-files \
     --output-dir ./my-dir \
     --force \
