@@ -214,7 +214,10 @@ await StoryblokMAPI.getAll(`spaces/${spaceId}/stories`)
 	.then(async (stories) => {
 		for (const story of stories) {
 			await StoryblokMAPI.get(`spaces/${spaceId}/stories/${story.id}`)
-				.then((response) => writeJson('stories', story.id, response.data.story))
+				.then((response) => {
+					delete response.data.story.preview_token
+					writeJson('stories', story.id, response.data.story)
+				})
 				.catch((error) => {
 					throw error
 				})
