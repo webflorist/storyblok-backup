@@ -43,11 +43,8 @@ The restore script is able to individually restore the the resources from the ba
 
 ```shell
 
-# simply auto-download and run via npx
-## for backup:
+# simply auto-download and run via npx (backup only)
 $ npx storyblok-backup
-## for restore:
-$ npx -p storyblok-backup storyblok-restore
 
 # or install globally
 $ npm install -g storyblok-backup
@@ -185,7 +182,9 @@ Also keep in mind, that there is a limit on artifact storage and runner minutes 
 
 ### Restore
 
-Call `npx -p storyblok-backup storyblok-restore` with the following options:
+Make sure to install the package first (see [Installation](#installation)).
+
+Call `npx storyblok-restore` with the following options:
 
 #### Restore options
 
@@ -235,7 +234,7 @@ Call `npx -p storyblok-backup storyblok-restore` with the following options:
 #### Minimal restore example
 
 ```shell
-npx -p storyblok-backup storyblok-restore --token 1234567890abcdef --space 12345 --type story --file ./.output/backup/123456789.json
+npx storyblok-restore --token 1234567890abcdef --space 12345 --type story --file ./.output/backup/123456789.json
 ```
 
 This will restore the story from the stated file by updating it.
@@ -243,7 +242,7 @@ This will restore the story from the stated file by updating it.
 #### Maximal restore example
 
 ```shell
-npx -p storyblok-backup storyblok-restore \
+npx storyblok-restore \
   --token 1234567890abcdef \
   --space 12345 \
   --region ap \

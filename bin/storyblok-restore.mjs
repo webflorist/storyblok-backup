@@ -37,7 +37,7 @@ const args = minimist(process.argv.slice(2))
 
 if ('help' in args) {
 	console.log(`USAGE
-  $ npx -p storyblok-backup storyblok-restore
+  $ npx storyblok-restore
   
 OPTIONS
   --token <token>     (required) Personal OAuth access token created
@@ -65,10 +65,10 @@ OPTIONS
   --help              Show this help
 
 MINIMAL EXAMPLE
-  $ npx -p storyblok-backup storyblok-restore --token 1234567890abcdef --space 12345 --type story --file ./.output/backup/123456789.json
+  $ npx storyblok-restore --token 1234567890abcdef --space 12345 --type story --file ./.output/backup/123456789.json
 
 MAXIMAL EXAMPLE
-  $ npx -p storyblok-backup storyblok-restore \\
+  $ npx storyblok-restore \\
       --token 1234567890abcdef \\
       --space 12345 \\
       --region ap \\
