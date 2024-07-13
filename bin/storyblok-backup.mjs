@@ -7,8 +7,11 @@ import zipLib from 'zip-lib'
 import minimist from 'minimist'
 import StoryblokClient from 'storyblok-js-client'
 import { performance } from 'perf_hooks'
+import dotenvx from '@dotenvx/dotenvx'
 
 const startTime = performance.now()
+
+dotenvx.config({ quiet: true })
 
 const args = minimist(process.argv.slice(2))
 
@@ -20,13 +23,16 @@ OPTIONS
   --token <token>     (required) Personal OAuth access token created
                       in the account settings of a Stoyblok user.
                       (NOT the Access Token of a Space!)
+                      Alternatively, you can set the STORYBLOK_OAUTH_TOKEN environment variable.
   --space <space_id>  (required) ID of the space to backup
+                      Alternatively, you can set the STORYBLOK_SPACE_ID environment variable.
   --region <region>   Region of the space. Possible values are:
                       - 'eu' (default): EU
                       - 'us': US
                       - 'ap': Australia
                       - 'ca': Canada
                       - 'cn': China
+                      Alternatively, you can set the STORYBLOK_REGION environment variable.
   --with-asset-files  Downloads all files (assets) of the space. Defaults to false.
   --output-dir <dir>  Directory to write the backup to. Defaults to ./.output
                       (ATTENTION: Will fail if the directory already exists!)
@@ -55,21 +61,30 @@ MAXIMAL EXAMPLE
 	process.exit(0)
 }
 
-if (!('token' in args)) {
+if (!('token' in args) && !process.env.STORYBLOK_OAUTH_TOKEN) {
 	console.log(
-		'Error: State your oauth token via the --token argument. Use --help to find out more.'
+		'Error: State your oauth token via the --token argument or the environment variable STORYBLOK_OAUTH_TOKEN. Use --help to find out more.'
 	)
 	process.exit(1)
 }
+const oauthToken = args.token || process.env.STORYBLOK_OAUTH_TOKEN
 
-if (!('space' in args)) {
-	console.log('Error: State your space id via the --space argument. Use --help to find out more.')
+if (!('space' in args) && !process.env.STORYBLOK_SPACE_ID) {
+	console.log(
+		'Error: State your space id via the --space argument or the environment variable STORYBLOK_SPACE_ID. Use --help to find out more.'
+	)
 	process.exit(1)
 }
+const spaceId = args.space || process.env.STORYBLOK_SPACE_ID
 
-if ('region' in args && !['eu', 'us', 'ap', 'ca', 'cn'].includes(args.region)) {
-	console.log('Error: Invalid region parameter stated. Use --help to find out more.')
-	process.exit(1)
+let region = 'eu'
+if ('region' in args || process.env.STORYBLOK_REGION) {
+	region = args.region || process.env.STORYBLOK_REGION
+
+	if (!['eu', 'us', 'ap', 'ca', 'cn'].includes(region)) {
+		console.log('Error: Invalid region parameter stated. Use --help to find out more.')
+		process.exit(1)
+	}
 }
 
 const verbose = 'verbose' in args
@@ -84,10 +99,6 @@ if (fs.existsSync(outputDir) && !('force' in args)) {
 	)
 	process.exit(1)
 }
-
-const spaceId = args.space
-
-const region = args['region'] || 'eu'
 
 const filePrefix = args['zip-prefix'] || 'backup'
 
@@ -112,7 +123,7 @@ if ('create-zip' in args) {
 
 // Init Management API
 const StoryblokMAPI = new StoryblokClient({
-	oauthToken: args.token,
+	oauthToken: oauthToken,
 	region: region,
 })
 
