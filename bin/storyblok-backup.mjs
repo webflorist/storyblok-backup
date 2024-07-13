@@ -137,20 +137,25 @@ fs.mkdirSync(backupDir, { recursive: true })
 
 const resources = [
 	'stories',
+	'collaborators',
 	'components',
 	'component-groups',
 	'assets',
 	'asset-folders',
+	'internal-tags',
 	'datasources',
 	'space-roles',
 	'tasks',
 	'activities',
 	'presets',
 	'field-types',
+	'webhooks',
 	'workflow-stages',
 	'workflow-stage-changes',
 	'workflows',
 	'releases',
+	'pipeline-branches',
+	'access-tokens',
 ]
 resources.forEach((resource) => fs.mkdirSync(`${backupDir}/${resource}`))
 
@@ -227,6 +232,10 @@ await StoryblokMAPI.getAll(`spaces/${spaceId}/stories`)
 		throw error
 	})
 
+// Fetch all collaborators
+console.log(`Fetching collaborators`)
+await defaultFetch('collaborators', 'collaborators', 'user_id')
+
 // Fetch all components
 console.log(`Fetching components`)
 await defaultFetch('components', 'components', 'name')
@@ -255,6 +264,10 @@ await StoryblokMAPI.getAll(`spaces/${spaceId}/assets`)
 // Fetch all asset-folders
 console.log(`Fetching asset-folders`)
 await defaultFetch('asset_folders', 'asset-folders', 'id')
+
+// Fetch all internal-tags
+console.log(`Fetching internal-tags`)
+await defaultFetch('internal_tags', 'internal-tags', 'id')
 
 // Fetch all datasources (including entries)
 console.log(`Fetching datasources`)
@@ -297,6 +310,10 @@ await defaultFetch('presets', 'presets', 'id')
 console.log(`Fetching field-types`)
 await defaultFetch('field_types', 'field-types', 'name')
 
+// Fetch all webhooks
+console.log(`Fetching webhooks`)
+await defaultFetch('webhook_endpoints', 'webhooks', 'id')
+
 // Fetch all workflow-stages
 console.log(`Fetching workflow-stages`)
 await defaultFetch('workflow_stages', 'workflow-stages', 'id')
@@ -312,6 +329,14 @@ await defaultFetch('workflows', 'workflows', 'id')
 // Fetch all releases
 console.log(`Fetching releases`)
 await defaultFetch('releases', 'releases', 'id')
+
+// Fetch all pipeline branches
+console.log(`Fetching pipeline branches`)
+await defaultFetch('branches', 'pipeline-branches', 'id')
+
+// Fetch all access tokens
+console.log(`Fetching access tokens`)
+await defaultFetch('api_keys', 'access-tokens', 'id')
 
 // Create zip file
 if ('create-zip' in args) {

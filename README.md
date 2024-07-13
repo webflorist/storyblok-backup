@@ -8,10 +8,12 @@ A npx CLI tool to create a full backup of a space of the [Storyblok CMS](https:/
 The script will fetch the following resources of a Storyblok space using the Management API and archive them in a zip file:
 
 - Stories
+- Collaborators
 - Components
 - Component groups
 - Assets (optionally incl. original files)
 - Asset folders
+- Internal Tags
 - Datasources (incl. entries)
 - Space
 - Space Roles
@@ -19,10 +21,13 @@ The script will fetch the following resources of a Storyblok space using the Man
 - Activities
 - Presets
 - Field types
+- Webhooks
 - Workflows
 - Workflow stages
 - Workflow stage changes
 - Releases
+- Pipelines
+- Access Tokens
 
 ## Installation
 
