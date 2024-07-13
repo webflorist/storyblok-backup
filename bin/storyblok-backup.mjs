@@ -181,7 +181,7 @@ const writeJson = (folder, file, content) => {
 		outputFile += `/${folder}`
 	}
 	outputFile += `/${file}.json`
-	fs.writeFileSync(outputFile, JSON.stringify(content), (error) => {
+	fs.writeFileSync(outputFile, JSON.stringify(content, null, 2), (error) => {
 		if (error) {
 			throw error
 		}
