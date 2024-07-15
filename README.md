@@ -31,12 +31,12 @@ The backup script will fetch the following resources of a Storyblok space using 
 - Pipeline Branches
 - Access Tokens
 
-The restore script is able to individually restore the the resources from the backup files (via update or create) with the following exceptions:
+The restore script is able to individually restore the resources from the backup files (via update or create) with the following exceptions:
 
-- Assets: Creating assets is not supported
-- Tasks: Currently not supported due to missing fields returned from management API
+- Assets: Only updating asset-resource-data is supported. Creating assets and updating asset-files is not supported.
+- Tasks: Currently not supported due to missing fields returned from management API.
 - Field types: Currently not supported
-- Workflow stage changes: No update possible
+- Workflow stage changes: No update possible.
 - Access Tokens: Creating access tokens from backup makes no sense, since it will result in a new token-string.
 
 ## Installation
