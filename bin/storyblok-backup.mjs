@@ -106,8 +106,8 @@ const fileName =
 	[
 		filePrefix,
 		new Date().getFullYear(),
-		new Date().getMonth().toString().padStart(2, '0'),
-		new Date().getDay().toString().padStart(2, '0'),
+		(new Date().getMonth() + 1).toString().padStart(2, '0'),
+		new Date().getDate().toString().padStart(2, '0'),
 		new Date().getHours().toString().padStart(2, '0'),
 		new Date().getMinutes().toString().padStart(2, '0'),
 		new Date().getSeconds().toString().padStart(2, '0'),
