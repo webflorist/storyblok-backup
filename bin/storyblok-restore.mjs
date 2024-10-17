@@ -54,7 +54,7 @@ OPTIONS
                       - 'cn': China
                       Alternatively, you can set the STORYBLOK_REGION environment variable.
   --type <type>       (required) Type of resource to restore. Possible values are:
-                      - '${resourceTypes.join("'\n                      - '")}
+                      - '${resourceTypes.join("'\n                      - '")}'
   --file <file>       (required) File of resource to restore.
   --publish           Perform a publish after restore of a story (default=false).
   --create            Create a new resource instead of updating (default=false).
