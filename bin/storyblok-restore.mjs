@@ -22,7 +22,7 @@ const resourceTypes = [
 	'datasource-entries',
 	'space',
 	'space-role',
-	//'task',  // Currently not supported due to missing fields returned from management API
+	'task',
 	'preset',
 	// 'field-type',
 	'webhook',

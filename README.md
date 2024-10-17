@@ -34,7 +34,6 @@ The backup script will fetch the following resources of a Storyblok space using 
 The restore script is able to individually restore the resources from the backup files (via update or create) with the following exceptions:
 
 - Assets: Only updating asset-resource-data is supported. Creating assets and updating asset-files is not supported.
-- Tasks: Currently not supported due to missing fields returned from management API.
 - Field types: Currently not supported
 - Workflow stage changes: No update possible.
 - Access Tokens: Creating access tokens from backup makes no sense, since it will result in a new token-string.
@@ -214,13 +213,14 @@ Call `npx storyblok-restore` with the following options:
                     - 'datasource-entries'
                     - 'space'
                     - 'space-role'
+                    - 'task'
                     - 'preset'
                     - 'webhook'
                     - 'workflow'
                     - 'workflow-stage'
                     - 'release'
                     - 'pipeline-branch'
-                    - 'access-token
+                    - 'access-token'
 --file <file>       (required) File of resource to restore.
 --publish           Perform a publish after restore of a story (default=false).
 --create            Create a new resource instead of updating (default=false).
