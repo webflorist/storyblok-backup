@@ -169,6 +169,8 @@ jobs:
         with:
           name: weekly-backup
           path: .output
+          include-hidden-files: true
+          if-no-files-found: error
 ```
 
 Make sure, to set the secrets `STORYBLOK_OAUTH_TOKEN` and `STORYBLOK_SPACE_ID` in your repository settings.
