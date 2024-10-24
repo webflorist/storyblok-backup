@@ -80,6 +80,29 @@ Call `npx storyblok-backup` with the following options:
                     - 'ca': Canada
                     - 'cn': China
                     Alternatively, you can set the STORYBLOK_REGION environment variable.
+--types <types>     Comma separated list of resource-types to backup. Defaults to all.
+                    Possible values are:
+                    - 'stories'
+                    - 'collaborators'
+                    - 'components'
+                    - 'component-groups'
+                    - 'assets'
+                    - 'asset-folders'
+                    - 'internal-tags'
+                    - 'datasources'
+                    - 'space'
+                    - 'space-roles'
+                    - 'tasks'
+                    - 'activities'
+                    - 'presets'
+                    - 'field-types'
+                    - 'webhooks'
+                    - 'workflow-stages'
+                    - 'workflow-stage-changes'
+                    - 'workflows'
+                    - 'releases'
+                    - 'pipeline-branches'
+                    - 'access-tokens'
 --with-asset-files  Downloads all files (assets) of the space. Defaults to false.
 --output-dir <dir>  Directory to write the backup to. Defaults to ./.output
                     (ATTENTION: Will fail if the directory already exists!)
@@ -107,7 +130,8 @@ This will create the folder `./.output/backup` and fetch all resources sorted in
 npx storyblok-backup \
     --token 1234567890abcdef \
     --space 12345 \
-    --region ap \\
+    --region ap \
+    --types "stories,components" \
     --with-asset-files \
     --output-dir ./my-dir \
     --force \

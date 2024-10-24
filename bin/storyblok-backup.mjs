@@ -13,6 +13,30 @@ const startTime = performance.now()
 
 dotenvx.config({ quiet: true })
 
+let resourceTypes = [
+	'stories',
+	'collaborators',
+	'components',
+	'component-groups',
+	'assets',
+	'asset-folders',
+	'internal-tags',
+	'datasources',
+	'space',
+	'space-roles',
+	'tasks',
+	'activities',
+	'presets',
+	'field-types',
+	'webhooks',
+	'workflow-stages',
+	'workflow-stage-changes',
+	'workflows',
+	'releases',
+	'pipeline-branches',
+	'access-tokens',
+]
+
 const args = minimist(process.argv.slice(2))
 
 if ('help' in args) {
@@ -33,6 +57,9 @@ OPTIONS
                       - 'ca': Canada
                       - 'cn': China
                       Alternatively, you can set the STORYBLOK_REGION environment variable.
+  --types <types>     Comma separated list of resource-types to backup. Defaults to all.
+                      Possible values are:
+                      - '${resourceTypes.join("'\n                      - '")}'
   --with-asset-files  Downloads all files (assets) of the space. Defaults to false.
   --output-dir <dir>  Directory to write the backup to. Defaults to ./.output
                       (ATTENTION: Will fail if the directory already exists!)
@@ -51,6 +78,7 @@ MAXIMAL EXAMPLE
       --token 1234567890abcdef \\
       --space 12345 \\
       --region ap \\
+      --types "stories,components" \\
       --with-asset-files \\
       --output-dir ./my-dir \\
       --force \\
@@ -85,6 +113,19 @@ if ('region' in args || process.env.STORYBLOK_REGION) {
 		console.log('Error: Invalid region parameter stated. Use --help to find out more.')
 		process.exit(1)
 	}
+}
+
+if ('types' in args) {
+	const typesToBackup = args.types.split(',')
+	for (const type of typesToBackup) {
+		if (!resourceTypes.includes(type)) {
+			console.log(
+				`Error: Invalid type parameter stated. "${type}" is not a valid resource type. Use --help to find out more.`
+			)
+			process.exit(1)
+		}
+	}
+	resourceTypes = typesToBackup
 }
 
 const verbose = 'verbose' in args
@@ -132,51 +173,30 @@ if (fs.existsSync(outputDir)) {
 	fs.rmSync(outputDir, { recursive: true, force: true })
 }
 
-// Create output directories
+// Create output directories (except for space, since this json will be saved in the root)
 fs.mkdirSync(backupDir, { recursive: true })
-
-const resources = [
-	'stories',
-	'collaborators',
-	'components',
-	'component-groups',
-	'assets',
-	'asset-folders',
-	'internal-tags',
-	'datasources',
-	'space-roles',
-	'tasks',
-	'activities',
-	'presets',
-	'field-types',
-	'webhooks',
-	'workflow-stages',
-	'workflow-stage-changes',
-	'workflows',
-	'releases',
-	'pipeline-branches',
-	'access-tokens',
-]
-resources.forEach((resource) => fs.mkdirSync(`${backupDir}/${resource}`))
+resourceTypes.forEach(
+	(resource) => resource === 'space' || fs.mkdirSync(`${backupDir}/${resource}`)
+)
 
 // Function to perform a default fetch
-const defaultFetch = async (type, folder, fileField, fileFieldObject) => {
-	await StoryblokMAPI.getAll(`spaces/${spaceId}/${type}`)
-		.then((items) => {
-			if (type === 'datasources') {
-				console.log(items)
-			}
-			items.forEach((item) =>
-				writeJson(
-					folder,
-					fileFieldObject ? item[fileFieldObject][fileField] : item[fileField],
-					item
+const defaultFetch = async (endpoint, type, fileField, fileFieldObject) => {
+	if (resourceTypes.includes(type)) {
+		console.log(`Fetching ${type}`)
+		await StoryblokMAPI.getAll(`spaces/${spaceId}/${endpoint}`)
+			.then((items) => {
+				items.forEach((item) =>
+					writeJson(
+						type,
+						fileFieldObject ? item[fileFieldObject][fileField] : item[fileField],
+						item
+					)
 				)
-			)
-		})
-		.catch((error) => {
-			throw error
-		})
+			})
+			.catch((error) => {
+				throw error
+			})
+	}
 }
 
 // Function to write a file
@@ -204,138 +224,129 @@ const downloadFile = async (type, name, url) => {
 }
 
 // Fetch space info
-console.log(`Fetching space`)
-await StoryblokMAPI.get(`spaces/${spaceId}/`)
-	.then((space) => {
-		writeJson(null, `space-${spaceId}`, space.data.space)
-	})
-	.catch((error) => {
-		throw error
-	})
+if (resourceTypes.includes('space')) {
+	console.log(`Fetching space`)
+	await StoryblokMAPI.get(`spaces/${spaceId}/`)
+		.then((space) => {
+			writeJson(null, `space-${spaceId}`, space.data.space)
+		})
+		.catch((error) => {
+			throw error
+		})
+}
 
 // Fetch all stories
-console.log(`Fetching stories`)
-await StoryblokMAPI.getAll(`spaces/${spaceId}/stories`)
-	.then(async (stories) => {
-		for (const story of stories) {
-			await StoryblokMAPI.get(`spaces/${spaceId}/stories/${story.id}`)
-				.then((response) => {
-					delete response.data.story.preview_token
-					writeJson('stories', story.id, response.data.story)
-				})
-				.catch((error) => {
-					throw error
-				})
-		}
-	})
-	.catch((error) => {
-		throw error
-	})
+if (resourceTypes.includes('stories')) {
+	console.log(`Fetching stories`)
+	await StoryblokMAPI.getAll(`spaces/${spaceId}/stories`)
+		.then(async (stories) => {
+			for (const story of stories) {
+				await StoryblokMAPI.get(`spaces/${spaceId}/stories/${story.id}`)
+					.then((response) => {
+						delete response.data.story.preview_token
+						writeJson('stories', story.id, response.data.story)
+					})
+					.catch((error) => {
+						throw error
+					})
+			}
+		})
+		.catch((error) => {
+			throw error
+		})
+}
 
 // Fetch all collaborators
-console.log(`Fetching collaborators`)
 await defaultFetch('collaborators', 'collaborators', 'user_id')
 
 // Fetch all components
-console.log(`Fetching components`)
 await defaultFetch('components', 'components', 'name')
 
 // Fetch all component-groups
-console.log(`Fetching component-groups`)
 await defaultFetch('component_groups', 'component-groups', 'id')
 
 // Fetch all assets (including files)
-console.log(`Fetching assets`)
-await StoryblokMAPI.getAll(`spaces/${spaceId}/assets`)
-	.then(async (assets) => {
-		for (const asset of assets) {
-			writeJson('assets', asset.id, asset)
-			if ('with-asset-files' in args) {
-				const fileExtension = asset.filename.split('.').at(-1)
-				const fileName = asset.id + '.' + fileExtension
-				await downloadFile('assets', fileName, asset.filename)
+if (resourceTypes.includes('assets')) {
+	console.log(`Fetching assets`)
+	await StoryblokMAPI.getAll(`spaces/${spaceId}/assets`)
+		.then(async (assets) => {
+			for (const asset of assets) {
+				writeJson('assets', asset.id, asset)
+				if ('with-asset-files' in args) {
+					const fileExtension = asset.filename.split('.').at(-1)
+					const fileName = asset.id + '.' + fileExtension
+					await downloadFile('assets', fileName, asset.filename)
+				}
 			}
-		}
-	})
-	.catch((error) => {
-		throw error
-	})
+		})
+		.catch((error) => {
+			throw error
+		})
+}
 
 // Fetch all asset-folders
-console.log(`Fetching asset-folders`)
 await defaultFetch('asset_folders', 'asset-folders', 'id')
 
 // Fetch all internal-tags
-console.log(`Fetching internal-tags`)
 await defaultFetch('internal_tags', 'internal-tags', 'id')
 
 // Fetch all datasources (including entries)
-console.log(`Fetching datasources`)
-await StoryblokMAPI.getAll(`spaces/${spaceId}/datasources`)
-	.then(async (datasources) => {
-		for (const datasource of datasources) {
-			writeJson('datasources', datasource.id, datasource)
-			await StoryblokMAPI.getAll(`spaces/${spaceId}/datasource_entries`, {
-				datasource_id: datasource.id,
-			})
-				.then((dateSourceEntries) =>
-					writeJson('datasources', datasource.id + '_entries', dateSourceEntries)
-				)
-				.catch((error) => {
-					throw error
+if (resourceTypes.includes('datasources')) {
+	console.log(`Fetching datasources`)
+	await StoryblokMAPI.getAll(`spaces/${spaceId}/datasources`)
+		.then(async (datasources) => {
+			for (const datasource of datasources) {
+				writeJson('datasources', datasource.id, datasource)
+				await StoryblokMAPI.getAll(`spaces/${spaceId}/datasource_entries`, {
+					datasource_id: datasource.id,
 				})
-		}
-	})
-	.catch((error) => {
-		throw error
-	})
+					.then((dateSourceEntries) =>
+						writeJson('datasources', datasource.id + '_entries', dateSourceEntries)
+					)
+					.catch((error) => {
+						throw error
+					})
+			}
+		})
+		.catch((error) => {
+			throw error
+		})
+}
 
 // Fetch all space roles
-console.log(`Fetching space roles`)
 await defaultFetch('space_roles', 'space-roles', 'id')
 
 // Fetch all tasks
-console.log(`Fetching tasks`)
 await defaultFetch('tasks', 'tasks', 'id')
 
 // Fetch all activities
-console.log(`Fetching activities`)
 await defaultFetch('activities', 'activities', 'id', 'activity')
 
 // Fetch all presets
-console.log(`Fetching presets`)
 await defaultFetch('presets', 'presets', 'id')
 
 // Fetch all field-types
-console.log(`Fetching field-types`)
 await defaultFetch('field_types', 'field-types', 'name')
 
 // Fetch all webhooks
-console.log(`Fetching webhooks`)
 await defaultFetch('webhook_endpoints', 'webhooks', 'id')
 
 // Fetch all workflow-stages
-console.log(`Fetching workflow-stages`)
 await defaultFetch('workflow_stages', 'workflow-stages', 'id')
 
 // Fetch all workflow-stage-changes
-console.log(`Fetching workflow-stage-changes`)
 await defaultFetch('workflow_stage_changes', 'workflow-stage-changes', 'id')
 
 // Fetch all workflows
-console.log(`Fetching workflows`)
 await defaultFetch('workflows', 'workflows', 'id')
 
 // Fetch all releases
-console.log(`Fetching releases`)
 await defaultFetch('releases', 'releases', 'id')
 
 // Fetch all pipeline branches
-console.log(`Fetching pipeline branches`)
 await defaultFetch('branches', 'pipeline-branches', 'id')
 
 // Fetch all access tokens
-console.log(`Fetching access tokens`)
 await defaultFetch('api_keys', 'access-tokens', 'id')
 
 // Create zip file
