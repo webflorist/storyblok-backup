@@ -251,6 +251,10 @@ Call `npx storyblok-restore` with the following options:
 --publish           Perform a publish after restore of a story (default=false).
 --create            Create a new resource instead of updating (default=false).
                     Not supported for assets.
+--propagate         Propagate new story UUID to referencing stories (default=false).
+                    Usable with create and stories. A create results in a new ID and UUID.
+                    This option will update all stories referencing the old
+                    UUID (as stated in the backup-json) with the new one.
 --id <file>         (required if type=datasource-entries and create is set)
                     ID of datasource the entries belong to.
 --verbose           Will show detailed result of the restore process.
@@ -276,6 +280,7 @@ npx storyblok-restore \
   --file ./.output/backup/123456789.json \
   --publish \
   --create \
+  --propagate \
   --verbose
 ```
 

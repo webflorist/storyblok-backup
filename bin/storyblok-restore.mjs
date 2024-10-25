@@ -59,6 +59,10 @@ OPTIONS
   --publish           Perform a publish after restore of a story (default=false).
   --create            Create a new resource instead of updating (default=false).
                       Not supported for assets.
+  --propagate         Propagate new story UUID to referencing stories (default=false).
+                      Usable with create and stories. A create results in a new ID and UUID.
+                      This option will update all stories referencing the old
+                      UUID (as stated in the backup-json) with the new one.
   --id <file>         (required if type=datasource-entries and create is set)
                       ID of datasource the entries belong to.
   --verbose           Will show detailed result of the restore process.
@@ -76,6 +80,7 @@ MAXIMAL EXAMPLE
       --file ./.output/backup/123456789.json \\
       --publish \\
       --create \\
+      --propagate \\
       --verbose
 `)
 	process.exit(0)
@@ -137,6 +142,18 @@ const publish = 'publish' in args
 
 const create = 'create' in args
 
+const propagate = 'propagate' in args
+if (propagate && !create) {
+	console.log('Error: Propagate is only usable with create. Use --help to find out more.')
+	process.exit(1)
+}
+if (propagate && args.type !== 'story') {
+	console.log(
+		'Error: Propagate is only usable with story resources. Use --help to find out more.'
+	)
+	process.exit(1)
+}
+
 // Init Management API
 const StoryblokMAPI = new StoryblokClient({
 	oauthToken: oauthToken,
@@ -144,7 +161,7 @@ const StoryblokMAPI = new StoryblokClient({
 })
 
 // Function to perform a default single resource restore
-const defaultSingleRestore = async (type, id, params) => {
+const defaultSingleRestore = async (type, id, params, forceUpdate) => {
 	if (publish) {
 		params.publish = 1
 	}
@@ -158,14 +175,15 @@ const defaultSingleRestore = async (type, id, params) => {
 		url = `${url}/${type}`
 	}
 
-	if (create) {
-		await StoryblokMAPI.post(url, params)
+	if (create && !forceUpdate) {
+		return await StoryblokMAPI.post(url, params)
 			.then((response) => {
 				console.log(`Created "${type}" resource.`)
 				if (verbose) {
 					console.log('Result:')
 					console.log(response.data)
 				}
+				return response.data
 			})
 			.catch((error) => {
 				throw error
@@ -174,13 +192,14 @@ const defaultSingleRestore = async (type, id, params) => {
 		if (id) {
 			url = `${url}/${id}`
 		}
-		await StoryblokMAPI.put(url, params)
+		return await StoryblokMAPI.put(url, params)
 			.then((response) => {
 				console.log(`Updated "${type}" resource with id "${id}".`)
 				if (verbose) {
 					console.log('Result:')
 					console.log(response.data)
 				}
+				return response.data
 			})
 			.catch((error) => {
 				throw error
@@ -193,7 +212,35 @@ const resource = JSON.parse(fs.readFileSync(args.file, 'utf8'))
 switch (args.type) {
 	case 'story':
 		delete resource.updated_at
-		await defaultSingleRestore('stories', resource.id, { story: resource })
+		const result = await defaultSingleRestore('stories', resource.id, { story: resource })
+		if (create && propagate) {
+			const oldUuid = resource.uuid
+			const newUuid = result.story.uuid
+			const newId = result.story.id
+			console.log(`Propagating UUID change from "${oldUuid}" to "${newUuid}":`)
+			const referencingStories = await StoryblokMAPI.getAll(`spaces/${spaceId}/stories`, {
+				reference_search: oldUuid,
+				excluding_ids: [newId],
+			})
+			for (const referencingStory of referencingStories) {
+				const fullReferencingStoryResult = await StoryblokMAPI.get(
+					`spaces/${spaceId}/stories/${referencingStory.id}`
+				)
+				await defaultSingleRestore(
+					'stories',
+					referencingStory.id,
+					{
+						story: JSON.parse(
+							JSON.stringify(fullReferencingStoryResult.data.story).replaceAll(
+								oldUuid,
+								newUuid
+							)
+						),
+					},
+					true
+				)
+			}
+		}
 		break
 	case 'collaborator':
 		await defaultSingleRestore(
