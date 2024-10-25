@@ -57,15 +57,15 @@ OPTIONS
                       - 'ca': Canada
                       - 'cn': China
                       Alternatively, you can set the STORYBLOK_REGION environment variable.
-  --types <types>     Comma separated list of resource-types to backup. Defaults to all.
+  --types <types>     Comma separated list of resource-types to backup (default=all).
                       Possible values are:
                       - '${resourceTypes.join("'\n                      - '")}'
-  --with-asset-files  Downloads all files (assets) of the space. Defaults to false.
-  --output-dir <dir>  Directory to write the backup to. Defaults to ./.output
+  --with-asset-files  Downloads all files (assets) of the space (default=false).
+  --output-dir <dir>  Directory to write the backup to (default=./.output)
                       (ATTENTION: Will fail if the directory already exists!)
   --force             Force deletion and recreation of existing output directory.
-  --create-zip        Create a zip file of the backup. Defaults to false.
-  --zip-prefix <dir>  Prefix for the zip file. Defaults to 'backup'.
+  --create-zip        Create a zip file of the backup (default=false).
+  --zip-prefix <dir>  Prefix for the zip file. (default='backup').
                       (The suffix will automatically be the current date.)
   --verbose           Will show detailed output for every file written.
   --help              Show this help
