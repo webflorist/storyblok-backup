@@ -227,7 +227,7 @@ Call `npx storyblok-restore` with the following options:
                     - 'ca': Canada
                     - 'cn': China
                     Alternatively, you can set the STORYBLOK_REGION environment variable.
---type <type>       (required) Type of resource to restore. Possible values are:
+--types <types>     Comma separated list of resource-types to backup (default=all).
                     - 'story'
                     - 'collaborator'
                     - 'component'
@@ -247,17 +247,14 @@ Call `npx storyblok-restore` with the following options:
                     - 'release'
                     - 'pipeline-branch'
                     - 'access-token'
---file <file>       (required) File of resource to restore.
---publish           Perform a publish after restore of a story (default=false).
---create            Create a new resource instead of updating (default=false).
-                    Not supported for assets.
---propagate         Propagate new story UUID to referencing stories (default=false).
-                    Usable with create and stories. A create results in a new ID and UUID.
-                    This option will update all stories referencing the old
-                    UUID (as stated in the backup-json) with the new one.
---id <file>         (required if type=datasource-entries and create is set)
-                    ID of datasource the entries belong to.
---verbose           Will show detailed result of the restore process.
+--with-asset-files  Downloads all files (assets) of the space (default=false).
+--output-dir <dir>  Directory to write the backup to (default=./.output)
+                    (ATTENTION: Will fail if the directory already exists!)
+--force             Force deletion and recreation of existing output directory.
+--create-zip        Create a zip file of the backup (default=false).
+--zip-prefix <dir>  Prefix for the zip file. (default='backup').
+                    (The suffix will automatically be the current date.)
+--verbose           Will show detailed output for every file written.
 --help              Show this help
 ```
 
