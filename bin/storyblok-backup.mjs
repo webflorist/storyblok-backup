@@ -227,8 +227,12 @@ const downloadFile = async (type, name, url) => {
 if (resourceTypes.includes('space')) {
 	console.log(`Fetching space`)
 	await StoryblokMAPI.get(`spaces/${spaceId}/`)
-		.then((space) => {
-			writeJson(null, `space-${spaceId}`, space.data.space)
+		.then((response) => {
+			// Delete request_count_today, since it increments on every request
+			// and is thus counterproductive for incremental backups.
+			delete response.data.space.request_count_today
+
+			writeJson(null, `space-${spaceId}`, response.data.space)
 		})
 		.catch((error) => {
 			throw error
@@ -243,7 +247,10 @@ if (resourceTypes.includes('stories')) {
 			for (const story of stories) {
 				await StoryblokMAPI.get(`spaces/${spaceId}/stories/${story.id}`)
 					.then((response) => {
+						// Delete preview_token, since it changes on every request
+						// and is thus counterproductive for incremental backups.
 						delete response.data.story.preview_token
+
 						writeJson('stories', story.id, response.data.story)
 					})
 					.catch((error) => {
