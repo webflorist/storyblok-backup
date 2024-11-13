@@ -235,7 +235,9 @@ on:
     types:
       - webhook
 
-concurrency: production
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   backup:
