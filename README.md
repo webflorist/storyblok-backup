@@ -38,6 +38,22 @@ The restore script is able to individually restore the resources from the backup
 - Workflow stage changes: No update possible.
 - Access Tokens: Creating access tokens from backup makes no sense, since it will result in a new token-string.
 
+## Table of contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Backup](#backup)
+    - [Backup options](#backup-options)
+    - [Minimal backup example](#minimal-backup-example)
+    - [Maximal backup example](#maximal-backup-example)
+    - [Continuous backup integration examples](#continuous-backup-integration-examples)
+      - [Example for a GitHub workflow for a complete backup as an artifact](#example-for-a-github-workflow-for-a-complete-backup-as-an-artifact)
+      - [Example for a GitHub workflow for an incremental git-commit-based backup](#example-for-a-github-workflow-for-an-incremental-git-commit-based-backup)
+  - [Restore](#restore)
+    - [Restore options](#restore-options)
+    - [Minimal restore example](#minimal-restore-example)
+    - [Maximal restore example](#maximal-restore-example)
+
 ## Installation
 
 ```shell
