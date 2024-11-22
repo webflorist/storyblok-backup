@@ -226,7 +226,7 @@ Also keep in mind, that there is a limit on artifact storage and runner minutes 
 
 ##### Example for a GitHub workflow for an incremental git-commit-based backup
 
-The following workflow should run via webhook on every relevant change (e.g.publish) in Storyblok. It creates a new current backup (excl. asset files) and commits them to the current repository in the `backup` folder. This enables an incremental git-commit-based backup of all Storyblok-content.
+The following workflow should run via webhook on every relevant change (e.g.publish) in Storyblok. It creates a new current backup (excl. asset files and resources of types access-tokens, activities and workflow-stage-changes) and commits them to the current repository in the `backup` folder. This enables an incremental git-commit-based backup of all Storyblok-content.
 
 ```yaml
 name: Incremental Repository Backup
@@ -257,7 +257,7 @@ jobs:
         env:
           STORYBLOK_OAUTH_TOKEN: ${{ secrets.STORYBLOK_OAUTH_TOKEN }}
           STORYBLOK_SPACE_ID: ${{ secrets.STORYBLOK_SPACE_ID }}
-        run: npx storyblok-backup
+        run: npx storyblok-backup --omit-types "access-tokens,activities,workflow-stage-changes"
 
       - name: Copy files into repository
         run: |
