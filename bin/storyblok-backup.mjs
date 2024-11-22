@@ -179,6 +179,11 @@ resourceTypes.forEach(
 	(resource) => resource === 'space' || fs.mkdirSync(`${backupDir}/${resource}`)
 )
 
+// Create separate directory for asset-files
+if (resourceTypes.includes('assets') && 'with-asset-files' in args) {
+	fs.mkdirSync(`${backupDir}/asset-files`)
+}
+
 // Function to perform a default fetch
 const defaultFetch = async (endpoint, type, fileField, fileFieldObject) => {
 	if (resourceTypes.includes(type)) {
@@ -282,7 +287,7 @@ if (resourceTypes.includes('assets')) {
 				if ('with-asset-files' in args) {
 					const fileExtension = asset.filename.split('.').at(-1)
 					const fileName = asset.id + '.' + fileExtension
-					await downloadFile('assets', fileName, asset.filename)
+					await downloadFile('asset-files', fileName, asset.filename)
 				}
 			}
 		})
