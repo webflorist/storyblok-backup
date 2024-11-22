@@ -44,31 +44,32 @@ if ('help' in args) {
   $ npx storyblok-backup
   
 OPTIONS
-  --token <token>     (required) Personal OAuth access token created
-                      in the account settings of a Stoyblok user.
-                      (NOT the Access Token of a Space!)
-                      Alternatively, you can set the STORYBLOK_OAUTH_TOKEN environment variable.
-  --space <space_id>  (required) ID of the space to backup
-                      Alternatively, you can set the STORYBLOK_SPACE_ID environment variable.
-  --region <region>   Region of the space. Possible values are:
-                      - 'eu' (default): EU
-                      - 'us': US
-                      - 'ap': Australia
-                      - 'ca': Canada
-                      - 'cn': China
-                      Alternatively, you can set the STORYBLOK_REGION environment variable.
-  --types <types>     Comma separated list of resource-types to backup (default=all).
-                      Possible values are:
-                      - '${resourceTypes.join("'\n                      - '")}'
-  --with-asset-files  Downloads all files (assets) of the space (default=false).
-  --output-dir <dir>  Directory to write the backup to (default=./.output)
-                      (ATTENTION: Will fail if the directory already exists!)
-  --force             Force deletion and recreation of existing output directory.
-  --create-zip        Create a zip file of the backup (default=false).
-  --zip-prefix <dir>  Prefix for the zip file. (default='backup').
-                      (The suffix will automatically be the current date.)
-  --verbose           Will show detailed output for every file written.
-  --help              Show this help
+  --token <token>       (required) Personal OAuth access token created
+                        in the account settings of a Stoyblok user.
+                        (NOT the Access Token of a Space!)
+                        Alternatively, you can set the STORYBLOK_OAUTH_TOKEN environment variable.
+  --space <space_id>    (required) ID of the space to backup
+                        Alternatively, you can set the STORYBLOK_SPACE_ID environment variable.
+  --region <region>     Region of the space. Possible values are:
+                        - 'eu' (default): EU
+                        - 'us': US
+                        - 'ap': Australia
+                        - 'ca': Canada
+                        - 'cn': China
+                        Alternatively, you can set the STORYBLOK_REGION environment variable.
+  --types <types>       Comma separated list of resource-types to backup (default=all).
+                        Possible values are:
+                        - '${resourceTypes.join("'\n                      - '")}'
+  --omit-types <types>  Comma separated list of resource-types to omit.
+  --with-asset-files    Downloads all files (assets) of the space (default=false).
+  --output-dir <dir>    Directory to write the backup to (default=./.output)
+                        (ATTENTION: Will fail if the directory already exists!)
+  --force               Force deletion and recreation of existing output directory.
+  --create-zip          Create a zip file of the backup (default=false).
+  --zip-prefix <dir>    Prefix for the zip file. (default='backup').
+                        (The suffix will automatically be the current date.)
+  --verbose             Will show detailed output for every file written.
+  --help                Show this help
 
 MINIMAL EXAMPLE
   $ npx storyblok-backup --token 1234567890abcdef --space 12345
@@ -79,6 +80,7 @@ MAXIMAL EXAMPLE
       --space 12345 \\
       --region ap \\
       --types "stories,components" \\
+      --omit-types "activities" \\
       --with-asset-files \\
       --output-dir ./my-dir \\
       --force \\
@@ -126,6 +128,11 @@ if ('types' in args) {
 		}
 	}
 	resourceTypes = typesToBackup
+}
+
+if ('omit-types' in args) {
+	const typesToOmit = args['omit-types'].split(',')
+	resourceTypes = resourceTypes.filter((type) => !typesToOmit.includes(type))
 }
 
 const verbose = 'verbose' in args
