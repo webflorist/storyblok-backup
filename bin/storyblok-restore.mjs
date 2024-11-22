@@ -154,6 +154,19 @@ if (propagate && args.type !== 'story') {
 	process.exit(1)
 }
 
+// Output General information
+console.log('')
+console.log(`Restoring backup in space ${spaceId}:`)
+console.log(`- resource type: ${args.type}`)
+console.log(`- file: ${args.file}`)
+if ('id' in args) {
+	console.log(`- datasource id: ${args.id}`)
+}
+console.log(`- mode: ${'create' in args ? 'create' : 'update'}`)
+console.log(`- publish: ${'publish' in args ? 'yes' : 'no'}`)
+console.log(`- propagate: ${'propagate' in args ? 'yes' : 'no'}`)
+console.log('')
+
 // Init Management API
 const StoryblokMAPI = new StoryblokClient({
 	oauthToken: oauthToken,

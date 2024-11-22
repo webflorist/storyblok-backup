@@ -163,11 +163,17 @@ const fileName =
 
 const filePath = `${outputDir}/${fileName}`
 
+// Output General information
+console.log('')
 console.log(`Creating backup for space ${spaceId}:`)
-console.log(`Output dir: ${outputDir}`)
+console.log(`- output dir: ${outputDir}`)
 if ('create-zip' in args) {
-	console.log(`Output zip: ${filePath}`)
+	console.log(`- output zip: ${filePath}`)
 }
+console.log(`- resource types: ${resourceTypes.join(', ')}`)
+console.log(`- with asset files: ${'with-asset-files' in args ? 'yes' : 'no'}`)
+console.log(`- force output folder: ${'force' in args ? 'yes' : 'no'}`)
+console.log('')
 
 // Init Management API
 const StoryblokMAPI = new StoryblokClient({
