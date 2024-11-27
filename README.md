@@ -161,7 +161,7 @@ This will create the folder `./my-dir/backup`, fetch all resources (incl. the or
 
 #### Continuous backup integration examples
 
-You can use this script to create periodic backups of Storyblok spaces using GitHub Actions and artifacts, or commit each content change to a git repository usint Storyblok's webhooks.
+You can use this script to create periodic backups of Storyblok spaces using GitHub Actions and artifacts, or commit each content change to a git repository using Storyblok's webhooks.
 
 ##### Example for a GitHub workflow for a complete backup as an artifact
 
