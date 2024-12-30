@@ -11,7 +11,7 @@ import dotenvx from '@dotenvx/dotenvx'
 
 const startTime = performance.now()
 
-dotenvx.config({ quiet: true })
+dotenvx.config({ quiet: true, ignore: ['MISSING_ENV_FILE'] })
 
 let resourceTypes = [
 	'stories',
