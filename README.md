@@ -5,7 +5,7 @@
 
 A npx CLI tool to create a full backup of a space of the [Storyblok CMS](https://www.storyblok.com).
 
-A restore tool to restore (create or update) resources is also included.
+A limited restore tool to restore (create or update) single resources is also included. A full restore-tool is available in a separate package: [netgen/storyblok-restore](https://github.com/netgen/storyblok-restore)
 
 The backup script will fetch the following resources of a Storyblok space using the Management API and archive them in a zip file:
 
@@ -37,6 +37,8 @@ The restore script is able to individually restore the resources from the backup
 - Field types: Currently not supported
 - Workflow stage changes: No update possible.
 - Access Tokens: Creating access tokens from backup makes no sense, since it will result in a new token-string.
+
+For a much more feature-rich full restore-tool see [netgen/storyblok-restore](https://github.com/netgen/storyblok-restore).
 
 ## Table of contents
 
@@ -281,6 +283,8 @@ Note that actions performing commits require the `contents: write` permission fo
 A webhook to the URL `https://api.github.com/repos/{owner}/{repo}/dispatches` must be setup and triggered by every relevant content change in Storyblok. Since Storyblok's webhooks do not support authentication headers - which are required by GitHub - you can use [Pipedream](https://pipedream.com) (or a similar service) as an intermediate webhook.
 
 ### Restore
+
+(NOTE: The included restore functionality is limited to restoring only single documents, and not full spaces. For a much more feature-rich full restore-tool see [netgen/storyblok-restore](https://github.com/netgen/storyblok-restore).)
 
 Make sure to install the package first (see [Installation](#installation)).
 
