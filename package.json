@@ -13,7 +13,7 @@
 	},
 	"bin": {
 		"storyblok-backup": "bin/storyblok-backup.mjs",
-		"storyblok-restore": "bin/storyblok-restore.mjs"
+		"storyblok-backup-restore": "bin/storyblok-backup-restore.mjs"
 	},
 	"repository": {
 		"type": "git",

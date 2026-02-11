@@ -288,7 +288,7 @@ A webhook to the URL `https://api.github.com/repos/{owner}/{repo}/dispatches` mu
 
 Make sure to install the package first (see [Installation](#installation)).
 
-Call `npx storyblok-restore` with the following options:
+Call `npx storyblok-backup-restore` with the following options:
 
 #### Restore options
 
@@ -343,7 +343,7 @@ Call `npx storyblok-restore` with the following options:
 #### Minimal restore example
 
 ```shell
-npx storyblok-restore --token 1234567890abcdef --space 12345 --type story --file ./.output/backup/123456789.json
+npx storyblok-backup-restore --token 1234567890abcdef --space 12345 --type story --file ./.output/backup/123456789.json
 ```
 
 This will restore the story from the stated file by updating it.
@@ -351,7 +351,7 @@ This will restore the story from the stated file by updating it.
 #### Maximal restore example
 
 ```shell
-npx storyblok-restore \
+npx storyblok-backup-restore \
   --token 1234567890abcdef \
   --space 12345 \
   --region ap \
