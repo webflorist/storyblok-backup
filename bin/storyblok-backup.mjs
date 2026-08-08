@@ -247,7 +247,7 @@ const downloadFile = async (type, name, url) => {
 	// Should we use node:http or node:https
 	const protocol = url.startsWith('https') ? https : http
 	// Why not just use node Fetch you ask?
-	// Creating an agent for fetch requires importing the ransitive dependency undici which node's
+	// Creating an agent for fetch requires importing the transitive dependency undici which node's
 	// fetch relies on. Since we're only ever doing GETs, in the interest of keeping the explicit dependency
 	// down, just use http/https directly
 
