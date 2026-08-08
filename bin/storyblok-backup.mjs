@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* eslint-disable no-console */
 import dotenvx from '@dotenvx/dotenvx'
 import fs from 'fs'
