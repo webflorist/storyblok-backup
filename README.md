@@ -121,6 +121,9 @@ Call `npx storyblok-backup` with the following options:
                       - 'access-tokens'
 --omit-types <types>  Comma separated list of resource-types to omit.
 --with-asset-files    Downloads all files (assets) of the space (default=false).
+--asset-file-names    How asset-files should be named. Possible values are:
+                      - 'id' (default): ID of the asset record
+                      - 'filename': Original filename of the asset
 --output-dir <dir>    Directory to write the backup to (default=./.output)
                       (ATTENTION: Will fail if the directory already exists!)
 --force               Force deletion and recreation of existing output directory.
@@ -150,6 +153,7 @@ npx storyblok-backup \
     --region ap \
     --types "stories,components" \
     --with-asset-files \
+    --asset-file-names filename \
     --output-dir ./my-dir \
     --force \
     --create-zip \

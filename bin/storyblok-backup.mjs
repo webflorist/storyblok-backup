@@ -62,6 +62,9 @@ OPTIONS
                         - '${resourceTypes.join("'\n                      - '")}'
   --omit-types <types>  Comma separated list of resource-types to omit.
   --with-asset-files    Downloads all files (assets) of the space (default=false).
+  --asset-file-names    How asset-files should be named. Possible values are:
+                        - 'id' (default): ID of the asset record
+                        - 'filename': Original filename of the asset
   --output-dir <dir>    Directory to write the backup to (default=./.output)
                         (ATTENTION: Will fail if the directory already exists!)
   --force               Force deletion and recreation of existing output directory.
@@ -82,6 +85,7 @@ MAXIMAL EXAMPLE
       --types "stories,components" \\
       --omit-types "activities" \\
       --with-asset-files \\
+      --asset-file-names "filename" \\
       --output-dir ./my-dir \\
       --force \\
       --create-zip \\
@@ -163,6 +167,8 @@ const fileName =
 
 const filePath = `${outputDir}/${fileName}`
 
+const assetFileNames = args['asset-file-names'] === 'filename' ? 'filename' : 'id'
+
 // Output General information
 console.log('')
 console.log(`Creating backup for space ${spaceId}:`)
@@ -172,6 +178,7 @@ if ('create-zip' in args) {
 }
 console.log(`- resource types: ${resourceTypes.join(', ')}`)
 console.log(`- with asset files: ${'with-asset-files' in args ? 'yes' : 'no'}`)
+console.log(`- asset file names: ${args['asset-file-names'] || 'id'}`)
 console.log(`- force output folder: ${'force' in args ? 'yes' : 'no'}`)
 console.log('')
 
@@ -236,6 +243,12 @@ const writeJson = (folder, file, content) => {
 const downloadFile = async (type, name, url) => {
 	const res = await fetch(url)
 	const outputFile = `${backupDir}/${type}/${name}`
+	if (fs.existsSync(outputFile)) {
+		const nameParts = name.split('.')
+		const newName = nameParts[0] + '_.' + nameParts[1]
+		await downloadFile(type, newName, url)
+		return
+	}
 	const fileStream = fs.createWriteStream(outputFile, { flags: 'wx' })
 	await finished(Readable.fromWeb(res.body).pipe(fileStream))
 	if (verbose) console.log(`Written file ${outputFile}`)
@@ -299,7 +312,11 @@ if (resourceTypes.includes('assets')) {
 				writeJson('assets', asset.id, asset)
 				if ('with-asset-files' in args) {
 					const fileExtension = asset.filename.split('.').at(-1)
-					const fileName = asset.id + '.' + fileExtension
+					const originalFileName = asset.filename.split('/').at(-1)
+					const fileName =
+						assetFileNames === 'filename'
+							? originalFileName
+							: asset.id + '.' + fileExtension
 					await downloadFile('asset-files', fileName, asset.filename)
 				}
 			}
