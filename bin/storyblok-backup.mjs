@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
+import dotenvx from '@dotenvx/dotenvx'
 import fs from 'fs'
-import { Readable } from 'stream'
+import http from 'http'
+import https from 'https'
+import minimist from 'minimist'
+import { performance } from 'perf_hooks'
+import StoryblokClient from 'storyblok-js-client'
 import { finished } from 'stream/promises'
 import zipLib from 'zip-lib'
-import minimist from 'minimist'
-import StoryblokClient from 'storyblok-js-client'
-import { performance } from 'perf_hooks'
-import dotenvx from '@dotenvx/dotenvx'
 
 const startTime = performance.now()
 
@@ -42,37 +43,40 @@ const args = minimist(process.argv.slice(2))
 if ('help' in args) {
 	console.log(`USAGE
   $ npx storyblok-backup
-  
+
 OPTIONS
-  --token <token>       (required) Personal OAuth access token created
-                        in the account settings of a Stoyblok user.
-                        (NOT the Access Token of a Space!)
-                        Alternatively, you can set the STORYBLOK_OAUTH_TOKEN environment variable.
-  --space <space_id>    (required) ID of the space to backup
-                        Alternatively, you can set the STORYBLOK_SPACE_ID environment variable.
-  --region <region>     Region of the space. Possible values are:
-                        - 'eu' (default): EU
-                        - 'us': US
-                        - 'ap': Australia
-                        - 'ca': Canada
-                        - 'cn': China
-                        Alternatively, you can set the STORYBLOK_REGION environment variable.
-  --types <types>       Comma separated list of resource-types to backup (default=all).
-                        Possible values are:
-                        - '${resourceTypes.join("'\n                      - '")}'
-  --omit-types <types>  Comma separated list of resource-types to omit.
-  --with-asset-files    Downloads all files (assets) of the space (default=false).
-  --asset-file-names    How asset-files should be named. Possible values are:
-                        - 'id' (default): ID of the asset record
-                        - 'filename': Original filename of the asset
-  --output-dir <dir>    Directory to write the backup to (default=./.output)
-                        (ATTENTION: Will fail if the directory already exists!)
-  --force               Force deletion and recreation of existing output directory.
-  --create-zip          Create a zip file of the backup (default=false).
-  --zip-prefix <dir>    Prefix for the zip file. (default='backup').
-                        (The suffix will automatically be the current date.)
-  --verbose             Will show detailed output for every file written.
-  --help                Show this help
+  --token <token>                (required) Personal OAuth access token created
+                                 in the account settings of a Stoyblok user.
+                                 (NOT the Access Token of a Space!)
+                                 Alternatively, you can set the STORYBLOK_OAUTH_TOKEN environment variable.
+  --space <space_id>             (required) ID of the space to backup
+                                 Alternatively, you can set the STORYBLOK_SPACE_ID environment variable.
+  --region <region>              Region of the space. Possible values are:
+                                 - 'eu' (default): EU
+                                 - 'us': US
+                                 - 'ap': Australia
+                                 - 'ca': Canada
+                                 - 'cn': China
+                                 Alternatively, you can set the STORYBLOK_REGION environment variable.
+  --types <types>                Comma separated list of resource-types to backup (default=all).
+                                 Possible values are:
+                                 - '${resourceTypes.join("'\n                                 - '")}'
+  --omit-types <types>           Comma separated list of resource-types to omit.
+  --with-asset-files             Downloads all files (assets) of the space (default=false).
+  --asset-file-names             How asset-files should be named. Possible values are:
+                                 - 'id' (default): ID of the asset record
+                                 - 'filename': Original filename of the asset
+  --no-reuse-asset-connections   Blocks reuse of http(s) connections to S3 when downloading assets,
+                                 this makes downloads slightly slower but can avoid errors if S3
+                                 closes the connection as a request is being made (default=false).
+  --output-dir <dir>             Directory to write the backup to (default=./.output)
+                                 (ATTENTION: Will fail if the directory already exists!)
+  --force                        Force deletion and recreation of existing output directory.
+  --create-zip                   Create a zip file of the backup (default=false).
+  --zip-prefix <dir>             Prefix for the zip file. (default='backup').
+                                 (The suffix will automatically be the current date.)
+  --verbose                      Will show detailed output for every file written.
+  --help                         Show this help
 
 MINIMAL EXAMPLE
   $ npx storyblok-backup --token 1234567890abcdef --space 12345
@@ -86,6 +90,7 @@ MAXIMAL EXAMPLE
       --omit-types "activities" \\
       --with-asset-files \\
       --asset-file-names "filename" \\
+      --no-reuse-asset-connections \\
       --output-dir ./my-dir \\
       --force \\
       --create-zip \\
@@ -140,6 +145,7 @@ if ('omit-types' in args) {
 }
 
 const verbose = 'verbose' in args
+const shouldReuseConnection = !(args['reuse-asset-connections'] === false)
 
 const outputDir = args['output-dir'] || './.output'
 
@@ -177,7 +183,9 @@ if ('create-zip' in args) {
 	console.log(`- output zip: ${filePath}`)
 }
 console.log(`- resource types: ${resourceTypes.join(', ')}`)
-console.log(`- with asset files: ${'with-asset-files' in args ? 'yes' : 'no'}`)
+console.log(
+	`- with asset files: ${'with-asset-files' in args ? 'yes' : 'no'}, reusing http(s) connections: ${shouldReuseConnection ? 'yes' : 'no'}`
+)
 console.log(`- asset file names: ${args['asset-file-names'] || 'id'}`)
 console.log(`- force output folder: ${'force' in args ? 'yes' : 'no'}`)
 console.log('')
@@ -241,17 +249,46 @@ const writeJson = (folder, file, content) => {
 
 // Function to download a file
 const downloadFile = async (type, name, url) => {
-	const res = await fetch(url)
 	const outputFile = `${backupDir}/${type}/${name}`
+
 	if (fs.existsSync(outputFile)) {
 		const nameParts = name.split('.')
 		const newName = nameParts[0] + '_.' + nameParts[1]
 		await downloadFile(type, newName, url)
 		return
 	}
-	const fileStream = fs.createWriteStream(outputFile, { flags: 'wx' })
-	await finished(Readable.fromWeb(res.body).pipe(fileStream))
-	if (verbose) console.log(`Written file ${outputFile}`)
+
+	// Should we use node:http or node:https
+	const protocol = url.startsWith('https') ? https : http
+	// Why not just use node Fetch you ask?
+	// Creating an agent for fetch requires importing the transitive dependency undici which node's
+	// fetch relies on. Since we're only ever doing GETs, in the interest of keeping the explicit dependency
+	// down, just use http/https directly
+
+	try {
+		await new Promise((resolve, reject) => {
+			protocol
+				.get(
+					url,
+					{ agent: new protocol.Agent({ keepAlive: shouldReuseConnection }) },
+					(res) => {
+						if (res.statusCode < 200 || res.statusCode >= 300) {
+							res.resume()
+							reject(new Error(`HTTP ${res.statusCode} ${res.statusMessage}`))
+							return
+						}
+						const fileStream = fs.createWriteStream(outputFile, {
+							flags: 'wx',
+						})
+						finished(res.pipe(fileStream)).then(resolve, reject)
+					}
+				)
+				.on('error', reject)
+		})
+		if (verbose) console.log(`Written file ${outputFile}`)
+	} catch (error) {
+		throw new Error(`Warning: failed to download ${url}: ${error.message}`)
+	}
 }
 
 // Fetch space info
@@ -397,10 +434,10 @@ if ('create-zip' in args) {
 	await zipLib
 		.archiveFolder(backupDir, filePath)
 		.then(
-			function () {
+			() => {
 				console.log(`Backup file '${filePath}' successfully created.`)
 			},
-			function (err) {
+			(err) => {
 				throw err
 			}
 		)

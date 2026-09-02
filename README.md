@@ -5,7 +5,7 @@
 
 A npx CLI tool to create a full backup of a space of the [Storyblok CMS](https://www.storyblok.com).
 
-A restore tool to restore (create or update) resources is also included.
+A limited restore tool to restore (create or update) single resources is also included. A full restore-tool is available in a separate package: [netgen/storyblok-restore](https://github.com/netgen/storyblok-restore)
 
 The backup script will fetch the following resources of a Storyblok space using the Management API and archive them in a zip file:
 
@@ -37,6 +37,8 @@ The restore script is able to individually restore the resources from the backup
 - Field types: Currently not supported
 - Workflow stage changes: No update possible.
 - Access Tokens: Creating access tokens from backup makes no sense, since it will result in a new token-string.
+
+For a much more feature-rich full restore-tool see [netgen/storyblok-restore](https://github.com/netgen/storyblok-restore).
 
 ## Table of contents
 
@@ -83,55 +85,58 @@ Call `npx storyblok-backup` with the following options:
 #### Backup options
 
 ```text
---token <token>       (required) Personal OAuth access token created
-                      in the account settings of a Stoyblok user.
-                      (NOT the Access Token of a Space!)
-                      Alternatively, you can set the STORYBLOK_OAUTH_TOKEN environment variable.
---space <space_id>    (required) ID of the space to backup
-                      Alternatively, you can set the STORYBLOK_SPACE_ID environment variable.
---region <region>     Region of the space. Possible values are:
-                      - 'eu' (default): EU
-                      - 'us': US
-                      - 'ap': Australia
-                      - 'ca': Canada
-                      - 'cn': China
-                      Alternatively, you can set the STORYBLOK_REGION environment variable.
---types <types>       Comma separated list of resource-types to backup (default=all).
-                      Possible values are:
-                      - 'stories'
-                      - 'collaborators'
-                      - 'components'
-                      - 'component-groups'
-                      - 'assets'
-                      - 'asset-folders'
-                      - 'internal-tags'
-                      - 'datasources'
-                      - 'space'
-                      - 'space-roles'
-                      - 'tasks'
-                      - 'activities'
-                      - 'presets'
-                      - 'field-types'
-                      - 'webhooks'
-                      - 'workflow-stages'
-                      - 'workflow-stage-changes'
-                      - 'workflows'
-                      - 'releases'
-                      - 'pipeline-branches'
-                      - 'access-tokens'
---omit-types <types>  Comma separated list of resource-types to omit.
---with-asset-files    Downloads all files (assets) of the space (default=false).
---asset-file-names    How asset-files should be named. Possible values are:
-                      - 'id' (default): ID of the asset record
-                      - 'filename': Original filename of the asset
---output-dir <dir>    Directory to write the backup to (default=./.output)
-                      (ATTENTION: Will fail if the directory already exists!)
---force               Force deletion and recreation of existing output directory.
---create-zip          Create a zip file of the backup (default=false).
---zip-prefix <dir>    Prefix for the zip file. (default='backup').
-                      (The suffix will automatically be the current date.)
---verbose             Will show detailed output for every file written.
---help                Show this help
+--token <token>                (required) Personal OAuth access token created
+                               in the account settings of a Stoyblok user.
+                               (NOT the Access Token of a Space!)
+                               Alternatively, you can set the STORYBLOK_OAUTH_TOKEN environment variable.
+--space <space_id>             (required) ID of the space to backup
+                               Alternatively, you can set the STORYBLOK_SPACE_ID environment variable.
+--region <region>              Region of the space. Possible values are:
+                               - 'eu' (default): EU
+                               - 'us': US
+                               - 'ap': Australia
+                               - 'ca': Canada
+                               - 'cn': China
+                               Alternatively, you can set the STORYBLOK_REGION environment variable.
+--types <types>                Comma separated list of resource-types to backup (default=all).
+                               Possible values are:
+                               - 'stories'
+                               - 'collaborators'
+                               - 'components'
+                               - 'component-groups'
+                               - 'assets'
+                               - 'asset-folders'
+                               - 'internal-tags'
+                               - 'datasources'
+                               - 'space'
+                               - 'space-roles'
+                               - 'tasks'
+                               - 'activities'
+                               - 'presets'
+                               - 'field-types'
+                               - 'webhooks'
+                               - 'workflow-stages'
+                               - 'workflow-stage-changes'
+                               - 'workflows'
+                               - 'releases'
+                               - 'pipeline-branches'
+                               - 'access-tokens'
+--omit-types <types>           Comma separated list of resource-types to omit.
+--with-asset-files             Downloads all files (assets) of the space (default=false).
+--asset-file-names             How asset-files should be named. Possible values are:
+                               - 'id' (default): ID of the asset record
+                               - 'filename': Original filename of the asset
+--no-reuse-asset-connections   Blocks reuse of http(s) connections to S3 when downloading assets,
+                               this makes downloads slightly slower but can avoid errors if S3
+                               closes the connection as a request is being made (default=false).
+--output-dir <dir>             Directory to write the backup to (default=./.output)
+                               (ATTENTION: Will fail if the directory already exists!)
+--force                        Force deletion and recreation of existing output directory.
+--create-zip                   Create a zip file of the backup (default=false).
+--zip-prefix <dir>             Prefix for the zip file. (default='backup').
+                               (The suffix will automatically be the current date.)
+--verbose                      Will show detailed output for every file written.
+--help                         Show this help
 ```
 
 OAuth token, space-id and region can be set via environment variables. You can also use a `.env` file in your project root for this (see `.env.example`).
@@ -154,6 +159,7 @@ npx storyblok-backup \
     --types "stories,components" \
     --with-asset-files \
     --asset-file-names filename \
+    --no-reuse-asset-connections \
     --output-dir ./my-dir \
     --force \
     --create-zip \
@@ -286,9 +292,11 @@ A webhook to the URL `https://api.github.com/repos/{owner}/{repo}/dispatches` mu
 
 ### Restore
 
+(NOTE: The included restore functionality is limited to restoring only single documents, and not full spaces. For a much more feature-rich full restore-tool see [netgen/storyblok-restore](https://github.com/netgen/storyblok-restore).)
+
 Make sure to install the package first (see [Installation](#installation)).
 
-Call `npx storyblok-restore` with the following options:
+Call `npx storyblok-backup-restore` with the following options:
 
 #### Restore options
 
@@ -343,7 +351,7 @@ Call `npx storyblok-restore` with the following options:
 #### Minimal restore example
 
 ```shell
-npx storyblok-restore --token 1234567890abcdef --space 12345 --type story --file ./.output/backup/123456789.json
+npx storyblok-backup-restore --token 1234567890abcdef --space 12345 --type story --file ./.output/backup/123456789.json
 ```
 
 This will restore the story from the stated file by updating it.
@@ -351,7 +359,7 @@ This will restore the story from the stated file by updating it.
 #### Maximal restore example
 
 ```shell
-npx storyblok-restore \
+npx storyblok-backup-restore \
   --token 1234567890abcdef \
   --space 12345 \
   --region ap \
