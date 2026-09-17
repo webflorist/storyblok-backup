@@ -238,6 +238,12 @@ const writeJson = (folder, file, content) => {
 	if (folder !== null) {
 		outputFile += `/${folder}`
 	}
+
+	// Sanitize file name
+	file = file.replaceAll('/', '_')
+	file = file.replaceAll('\\', '_')
+	file = file.replaceAll('..', '_')
+
 	outputFile += `/${file}.json`
 	fs.writeFileSync(outputFile, JSON.stringify(content, null, 2), (error) => {
 		if (error) {
