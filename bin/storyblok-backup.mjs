@@ -240,6 +240,7 @@ const writeJson = (folder, file, content) => {
 	}
 
 	// Sanitize file name
+	file = String(file)
 	file = file.replaceAll('/', '_')
 	file = file.replaceAll('\\', '_')
 	file = file.replaceAll('..', '_')
