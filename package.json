@@ -3,7 +3,7 @@
 	"version": "0.7.2",
 	"description": "npx CLI tool to create a full backup of a Storyblok space and restore single resources from it.",
 	"scripts": {
-		"upgrade": "npx npm-check-updates -i -u && pnpm install",
+		"upgrade-packages": "pnpm dlx npm-check-updates --interactive --upgrade --root --install never --cooldown 2",
 		"lint:js": "eslint --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .lintignore .",
 		"lintfix:js": "pnpm lint:js --fix",
 		"lint:prettier": "prettier --ignore-path ./.lintignore --check .",
