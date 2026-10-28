@@ -4,7 +4,7 @@
 	"description": "npx CLI tool to create a full backup of a Storyblok space and restore single resources from it.",
 	"scripts": {
 		"upgrade-packages": "pnpm dlx npm-check-updates --interactive --upgrade --root --install never --cooldown 2",
-		"lint:js": "eslint --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .lintignore .",
+		"lint:js": "eslint --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts .",
 		"lintfix:js": "pnpm lint:js --fix",
 		"lint:prettier": "prettier --ignore-path ./.lintignore --check .",
 		"lintfix:prettier": "prettier --ignore-path ./.lintignore --write --list-different .",
@@ -35,15 +35,18 @@
 	},
 	"homepage": "https://github.com/webflorist/storyblok-backup#readme",
 	"devDependencies": {
-		"eslint": "^8.49.0",
-		"eslint-config-prettier": "^9.1.0",
-		"eslint-plugin-prettier": "^5.1.3",
-		"prettier": "^3.3.2"
+		"@eslint/eslintrc": "^3.3.7",
+		"@eslint/js": "^10.0.1",
+		"eslint": "^10.13.0",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-prettier": "^5.5.7",
+		"globals": "^17.13.0",
+		"prettier": "^3.9.10"
 	},
 	"dependencies": {
-		"@dotenvx/dotenvx": "^1.6.2",
+		"@dotenvx/dotenvx": "^2.38.2",
 		"minimist": "^1.2.8",
-		"storyblok-js-client": "^6.7.3",
-		"zip-lib": "^1.0.4"
+		"storyblok-js-client": "^7.8.1",
+		"zip-lib": "^1.4.0"
 	}
 }
