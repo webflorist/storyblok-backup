@@ -257,7 +257,6 @@ jobs:
       contents: write
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
